@@ -1,6 +1,6 @@
 # Headless Server Quick Start Guide
 
-**Get your Meshtastic Bridge running in 5 minutes!**
+**Get your Meshtastic Bridge running in 2 minutes!**
 
 ## Prerequisites
 
@@ -8,7 +8,27 @@
 - Two Meshtastic radios with USB cables
 - Internet connection for installation
 
-## Installation Steps
+## One-Command Installation
+
+**Connect your radios, then run:**
+
+```bash
+git clone https://github.com/IceNet-01/meshtastic-bridge.git && cd meshtastic-bridge && ./install-auto.sh
+```
+
+**That's it!** The script does everything automatically:
+- ✅ Installs all dependencies
+- ✅ Configures permissions
+- ✅ Sets up the service
+- ✅ Starts your bridge
+
+⏱️ **Takes 2-3 minutes total.**
+
+---
+
+## Alternative: Interactive Installation
+
+If you prefer to review each step:
 
 ### 1. Download/Clone the Project
 
@@ -28,6 +48,8 @@ Plug both Meshtastic radios into USB ports on your server.
 ```
 
 When prompted "Do you want to start the service now?", press `Y` and Enter.
+
+---
 
 ### 4. Verify It's Running
 

@@ -1,6 +1,10 @@
 #!/bin/bash
 # Headless Server Installation Script for Meshtastic Bridge
 # This script automates the complete installation of the headless bridge service
+#
+# Usage:
+#   ./install-headless.sh           # Interactive mode (asks questions)
+#   ./install-headless.sh --auto    # Fully automated (no prompts)
 
 set -e  # Exit on error
 
@@ -10,14 +14,31 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Logging functions
+log_info() { echo -e "${BLUE}ℹ${NC} $1"; }
+log_success() { echo -e "${GREEN}✓${NC} $1"; }
+log_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
+log_error() { echo -e "${RED}✗${NC} $1"; }
+
+# Check for auto mode
+AUTO_MODE=false
+if [[ "$1" == "--auto" ]] || [[ "$1" == "-y" ]] || [[ "$1" == "--yes" ]]; then
+    AUTO_MODE=true
+fi
+
 echo -e "${BLUE}======================================${NC}"
 echo -e "${GREEN}Meshtastic Bridge - Headless Server${NC}"
 echo -e "${BLUE}======================================${NC}"
 echo ""
 
+if [ "$AUTO_MODE" = true ]; then
+    log_info "Running in automatic mode (no prompts)"
+    echo ""
+fi
+
 # Check if running as root
 if [ "$EUID" -eq 0 ]; then
-    echo -e "${RED}Error: Do not run this script as root!${NC}"
+    log_error "Do not run this script as root!"
     echo "Run as your regular user. The script will use sudo when needed."
     exit 1
 fi
@@ -29,12 +50,15 @@ echo ""
 
 # Step 1: Add user to dialout group for serial port access
 echo -e "${YELLOW}[1/5] Configuring user permissions...${NC}"
+NEED_RELOGIN=false
 if groups $USER | grep -q '\bdialout\b'; then
-    echo "✓ User $USER is already in dialout group"
+    log_success "User $USER is already in dialout group"
 else
-    echo "Adding user $USER to dialout group..."
+    log_info "Adding user $USER to dialout group..."
     sudo usermod -a -G dialout $USER
-    echo -e "${YELLOW}NOTE: You will need to log out and log back in for group changes to take effect!${NC}"
+    log_success "Added to dialout group"
+    NEED_RELOGIN=true
+    log_warning "NOTE: You will need to log out and log back in for group changes to take effect!"
 fi
 echo ""
 
@@ -127,29 +151,42 @@ echo "  ${BLUE}Run once:${NC}        cd $SCRIPT_DIR && source venv/bin/activate 
 echo ""
 
 # Offer to start the service now
-read -p "Do you want to start the service now? [Y/n]: " START_NOW
-START_NOW=${START_NOW:-Y}
+if [ "$AUTO_MODE" = true ]; then
+    START_NOW="Y"
+else
+    read -p "Do you want to start the service now? [Y/n]: " START_NOW
+    START_NOW=${START_NOW:-Y}
+fi
 
 if [[ "$START_NOW" =~ ^[Yy]$ ]]; then
     echo ""
-    echo "Starting meshtastic-bridge service..."
+    log_info "Starting meshtastic-bridge service..."
     sudo systemctl start meshtastic-bridge
-    echo "✓ Service started!"
-    echo ""
-    echo "Checking service status..."
     sleep 2
-    sudo systemctl status meshtastic-bridge --no-pager
-    echo ""
-    echo -e "${YELLOW}View live logs with:${NC} sudo journalctl -u meshtastic-bridge -f"
+
+    if sudo systemctl is-active --quiet meshtastic-bridge; then
+        log_success "Service is running!"
+        echo ""
+        log_info "Checking service status..."
+        sudo systemctl status meshtastic-bridge --no-pager
+        echo ""
+        echo -e "${YELLOW}View live logs with:${NC} sudo journalctl -u meshtastic-bridge -f"
+    else
+        log_warning "Service started but may have issues"
+        echo "Check logs: sudo journalctl -u meshtastic-bridge -n 50"
+    fi
 else
     echo ""
-    echo "Service not started. Start it later with:"
+    log_info "Service not started. Start it later with:"
     echo "  sudo systemctl start meshtastic-bridge"
 fi
 
 echo ""
-if ! groups | grep -q '\bdialout\b'; then
-    echo -e "${YELLOW}⚠ IMPORTANT: You MUST log out and log back in for serial port access to work!${NC}"
+if [ "$NEED_RELOGIN" = true ]; then
+    echo -e "${YELLOW}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}║  ⚠  IMPORTANT: You must log out and back in  ║${NC}"
+    echo -e "${YELLOW}║     for USB permissions to take effect!       ║${NC}"
+    echo -e "${YELLOW}╚════════════════════════════════════════════════╝${NC}"
     echo ""
 fi
 

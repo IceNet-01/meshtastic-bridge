@@ -22,6 +22,18 @@ A powerful bridge/repeater application for Meshtastic radios that forwards messa
 - ✅ **Resource Efficient**: Minimal memory and CPU usage
 - ✅ **Security Hardened**: Runs with minimal privileges
 
+## 🚀 Quick Install (2 minutes)
+
+**One command to install everything:**
+
+```bash
+git clone https://github.com/IceNet-01/meshtastic-bridge.git && cd meshtastic-bridge && ./install-auto.sh
+```
+
+That's it! The script installs dependencies, configures the service, and starts your bridge automatically.
+
+**📖 See [INSTALL.md](INSTALL.md) for complete installation options and troubleshooting.**
+
 ## Features
 
 - **Auto-Detection**: Automatically finds and connects to your Meshtastic radios
@@ -46,53 +58,47 @@ A powerful bridge/repeater application for Meshtastic radios that forwards messa
 
 ## Installation
 
-### Quick Install
+### Automated Install (Recommended)
 
-Run the installation script to set everything up automatically:
+**For headless server (production deployments):**
 
 ```bash
-cd /home/mesh/meshtastic-bridge
-./install.sh
+git clone https://github.com/IceNet-01/meshtastic-bridge.git
+cd meshtastic-bridge
+./install-auto.sh
 ```
 
-This will:
-1. Add your user to the `dialout` group for serial port access
-2. Install system dependencies (python3-venv, python3-pip)
-3. Set up the Python virtual environment
-4. Install all required packages
-5. Make scripts executable
-6. Optionally install the systemd service for auto-start at boot
-7. Optionally create a desktop shortcut
+**For local testing with options:**
+
+```bash
+./install-headless.sh          # Interactive mode
+./install-headless.sh --auto   # Fully automated
+```
+
+### What Gets Installed
+
+The installer automatically:
+1. ✅ Adds your user to the `dialout` group for USB access
+2. ✅ Installs system dependencies (`python3-venv`, `python3-pip`)
+3. ✅ Sets up Python virtual environment
+4. ✅ Installs required packages (headless-only)
+5. ✅ Configures systemd service for auto-start
+6. ✅ Enables auto-restart on crash
+7. ✅ Starts the service immediately
+
+**Installation takes 2-3 minutes.**
+
+### Dependencies (Headless)
+
+- `meshtastic` >= 2.7.0
+- `pyserial` >= 3.5
+- `rich` >= 14.2.0 (for enhanced logging)
+
+**Note**: This headless fork does NOT require `textual` (GUI framework).
 
 ### Manual Installation
 
-If you prefer to install manually:
-
-```bash
-cd /home/mesh/meshtastic-bridge
-
-# Add user to dialout group
-sudo usermod -a -G dialout $USER
-# Log out and log back in for this to take effect
-
-# Install system dependencies
-sudo apt install python3-venv python3-pip
-
-# Set up virtual environment
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Make scripts executable
-chmod +x *.py *.sh
-```
-
-Dependencies (Headless):
-- meshtastic
-- rich (for enhanced logging)
-- pyserial
-
-**Note**: This headless fork does NOT require `textual` (GUI framework). For the original GUI version, see the upstream repository.
+See **[INSTALL.md](INSTALL.md)** for manual installation steps and troubleshooting.
 
 ## Usage
 

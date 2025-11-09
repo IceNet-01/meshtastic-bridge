@@ -26,17 +26,34 @@ This is a headless (no GUI) server version of the Meshtastic Bridge that automat
 
 ## Quick Start Installation
 
-### 1. Clone or download this repository
+### Super Quick (One Command)
+
+**Connect your radios, then run:**
+
+```bash
+git clone https://github.com/IceNet-01/meshtastic-bridge.git && cd meshtastic-bridge && ./install-auto.sh
+```
+
+Done! The script automatically:
+- ✅ Installs all dependencies
+- ✅ Configures permissions and service
+- ✅ Enables auto-start and auto-restart
+- ✅ Starts your bridge immediately
+
+**Takes 2-3 minutes. No prompts needed.**
+
+---
+
+### Standard Installation (With Options)
+
+If you already have the repository or want interactive installation:
 
 ```bash
 git clone https://github.com/IceNet-01/meshtastic-bridge.git
 cd meshtastic-bridge
-```
-
-### 2. Run the headless installation script
-
-```bash
-./install-headless.sh
+./install-headless.sh          # Interactive mode
+# or
+./install-headless.sh --auto   # Fully automated
 ```
 
 This script will:
@@ -47,16 +64,11 @@ This script will:
 - Install and enable systemd service
 - Configure auto-start on boot
 - Configure auto-restart on crash
+- Start the service automatically
 
-### 3. Connect your radios and start
+Your bridge is now running and will survive reboots and crashes.
 
-The service will start automatically after installation, or you can start it manually:
-
-```bash
-sudo systemctl start meshtastic-bridge
-```
-
-That's it! Your bridge is now running and will survive reboots and crashes.
+**📖 For detailed installation options and troubleshooting, see [INSTALL.md](INSTALL.md)**
 
 ## Service Management
 
