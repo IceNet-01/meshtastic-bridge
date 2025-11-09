@@ -1,0 +1,107 @@
+# Meshtastic Bridge Configuration Example
+# Version 2.0
+
+# Bridge Settings
+bridge:
+  # Automatically detect connected radios
+  auto_detect: true
+
+  # Manual port specification (used if auto_detect is false)
+  # ports:
+  #   - /dev/ttyUSB0
+  #   - /dev/ttyUSB1
+
+  # Message tracking settings
+  message_tracking:
+    max_age_minutes: 10    # How long to track messages for deduplication
+    max_messages: 1000     # Maximum messages to keep in memory
+
+# Channel Mapping
+# Maps channels between radios (not currently used but reserved for future)
+channels:
+  mapping:
+    LongFast: LongModerate
+    LongModerate: LongFast
+
+# Message Filtering
+filtering:
+  enabled: false           # Enable/disable message filtering
+
+  # Node-based filtering
+  whitelist_nodes: []      # If set, ONLY these nodes are forwarded
+  # whitelist_nodes:
+  #   - "!abc123456"
+  #   - "!def789012"
+
+  blacklist_nodes: []      # These nodes are never forwarded
+  # blacklist_nodes:
+  #   - "!bad123456"
+
+  # Content-based filtering
+  content_filters:
+    # Block messages containing these keywords
+    keywords: []
+    # keywords:
+    #   - spam
+    #   - advertisement
+
+    # Block messages matching these regex patterns
+    regex_patterns: []
+    # regex_patterns:
+    #   - '\b\d{3}-\d{3}-\d{4}\b'  # Phone numbers
+
+  # Channel-based filtering
+  allowed_channels: []     # If set, only these channels are forwarded
+  blocked_channels: []     # These channels are never forwarded
+
+  # Custom filter rules (advanced)
+  custom_rules: []
+  # custom_rules:
+  #   - name: "Emergency Priority"
+  #     type: keyword          # keyword, regex, sender, channel
+  #     pattern: "EMERGENCY"
+  #     action: allow          # allow or block
+  #     priority: 100          # Higher priority evaluated first
+
+# Database Settings
+database:
+  enabled: true                           # Enable message persistence
+  path: ./meshtastic_bridge.db           # Database file path
+  retention_days: 30                      # Delete messages older than this
+
+# Metrics Export (Prometheus)
+metrics:
+  enabled: true                           # Enable metrics endpoint
+  port: 9090                              # Metrics server port
+  path: /metrics                          # Metrics endpoint path
+
+# MQTT Integration
+mqtt:
+  enabled: false                          # Enable MQTT bridge
+  broker: localhost                       # MQTT broker hostname
+  port: 1883                              # MQTT broker port
+  username: null                          # MQTT username (optional)
+  password: null                          # MQTT password (optional)
+  topic_prefix: meshtastic/bridge         # Topic prefix for all messages
+  publish_incoming: true                  # Publish received messages
+  publish_outgoing: true                  # Publish sent messages
+  qos: 1                                  # MQTT QoS level (0, 1, 2)
+  retain: false                           # Retain messages on broker
+  homeassistant_discovery: false          # Enable Home Assistant auto-discovery
+
+# Web Interface
+web:
+  enabled: true                           # Enable web dashboard
+  host: 0.0.0.0                          # Listen on all interfaces
+  port: 8080                              # Web server port
+  api_enabled: true                       # Enable REST API
+  secret_key: meshtastic-bridge-secret    # Session secret key
+  debug: false                            # Enable debug mode
+
+# Logging
+logging:
+  level: INFO                             # Log level: DEBUG, INFO, WARNING, ERROR
+  file: null                              # Log file path (null for stdout only)
+  # file: ./meshtastic-bridge.log
+  max_bytes: 10485760                     # Max log file size (10MB)
+  backup_count: 5                         # Number of backup log files
