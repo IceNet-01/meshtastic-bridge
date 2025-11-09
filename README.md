@@ -2,8 +2,23 @@
 
 A powerful bridge/repeater application for Meshtastic radios that forwards messages between different channel configurations (e.g., LongFast and LongModerate).
 
+## 🎉 Version 2.0 Released!
+
+The enhanced bridge now includes professional-grade features for monitoring, filtering, and integration:
+
+✅ **Configuration Files** - YAML/JSON support for easy customization
+✅ **Message Filtering** - Filter by sender, content (keywords/regex), or channel
+✅ **SQLite Database** - Persistent message storage and search
+✅ **Prometheus Metrics** - Monitor performance with Grafana
+✅ **MQTT Integration** - Publish to MQTT, Home Assistant support
+✅ **Web Dashboard** - Real-time web interface with API
+✅ **Multiple Radios** - Support for >2 radios simultaneously
+
+See [FEATURES.md](FEATURES.md) for detailed documentation | [ROADMAP.md](ROADMAP.md) for future plans
+
 ## Features
 
+### Core Features (v1.0)
 - **Auto-Detection**: Automatically finds and connects to your Meshtastic radios
 - **Settings Verification**: Checks radio configuration and provides recommendations
 - **Auto-Start at Boot**: Optional systemd service for hands-free operation
@@ -18,10 +33,38 @@ A powerful bridge/repeater application for Meshtastic radios that forwards messa
 - **Bidirectional Communication**: Messages flow both ways between radios
 - **Channel Support**: Works with different channel configurations
 
+### Enhanced Features (v2.0)
+- **Configuration Management**: YAML/JSON config files for all settings
+- **Message Filtering**:
+  - Whitelist/blacklist by node ID
+  - Content filtering with keywords and regex patterns
+  - Channel-based filtering
+  - Custom filter rules with priorities
+- **Database Persistence**:
+  - SQLite storage for message history
+  - Full-text message search
+  - Node registry and statistics
+  - Automatic cleanup of old messages
+- **Metrics & Monitoring**:
+  - Prometheus metrics endpoint
+  - Message throughput, error rates, processing times
+  - Ready for Grafana dashboards
+- **MQTT Bridge**:
+  - Publish messages to MQTT broker
+  - Subscribe to commands for sending
+  - Home Assistant auto-discovery
+  - Flexible topic mapping
+- **Web Interface**:
+  - Real-time dashboard with live updates
+  - REST API for integration
+  - Send messages via web UI
+  - Statistics visualization
+- **Multiple Radio Support**: Connect and bridge >2 radios simultaneously
+
 ## Requirements
 
 - Python 3.8+
-- Two Meshtastic-compatible radios
+- Two or more Meshtastic-compatible radios
 - USB serial connections
 
 ## Installation
@@ -68,16 +111,69 @@ chmod +x *.py *.sh
 ```
 
 Dependencies:
-- meshtastic
-- textual
-- rich
-- pyserial
+- Core: meshtastic, pyserial, pubsub
+- UI: textual, rich
+- Configuration: pyyaml
+- MQTT: paho-mqtt
+- Web: flask, flask-cors, flask-socketio
+- Utilities: python-dateutil
+
+See [requirements.txt](requirements.txt) for complete list.
 
 ## Usage
 
-### Easy Way: Auto-Detection (Recommended)
+### Version 2.0 Enhanced Bridge (Recommended)
 
-Just connect both radios and run:
+The enhanced bridge includes all v2.0 features (web UI, MQTT, metrics, filtering, database):
+
+```bash
+# First, create a configuration file
+python bridge_enhanced.py --create-config meshtastic-bridge.yaml
+
+# Edit the configuration to enable desired features
+nano meshtastic-bridge.yaml
+
+# Run the enhanced bridge
+source venv/bin/activate
+python bridge_enhanced.py -c meshtastic-bridge.yaml
+```
+
+**Access the services:**
+- 🌐 **Web Dashboard**: http://localhost:8080
+- 📊 **Prometheus Metrics**: http://localhost:9090/metrics
+- 🔌 **REST API**: http://localhost:8080/api/status
+
+**Example configuration:**
+```yaml
+bridge:
+  auto_detect: true
+
+database:
+  enabled: true
+  path: ./meshtastic_bridge.db
+
+metrics:
+  enabled: true
+  port: 9090
+
+web:
+  enabled: true
+  port: 8080
+
+mqtt:
+  enabled: false  # Enable if you have an MQTT broker
+
+filtering:
+  enabled: false  # Enable to filter messages
+```
+
+See [config.example.yaml](config.example.yaml) for all options.
+
+### Version 1.0 Basic Bridge
+
+For simple bridging without advanced features:
+
+**Easy Way: Auto-Detection**
 
 ```bash
 cd /home/mesh/meshtastic-bridge
@@ -89,15 +185,15 @@ The script will:
 - Ask if you want GUI or headless mode
 - Start the bridge automatically
 
-Or run directly with auto-detection:
+**Run directly with auto-detection:**
 
-**With GUI:**
+With GUI:
 ```bash
 source venv/bin/activate
 python gui.py
 ```
 
-**Without GUI (headless):**
+Without GUI (headless):
 ```bash
 source venv/bin/activate
 python bridge.py
@@ -229,7 +325,23 @@ sudo systemctl enable meshtastic-bridge
 
 ## Configuration
 
-You can modify the message tracking settings in `bridge.py`:
+### Version 2.0 Configuration Files
+
+Create and customize a configuration file:
+
+```bash
+# Create example configuration
+python bridge_enhanced.py --create-config meshtastic-bridge.yaml
+
+# Edit the configuration
+nano meshtastic-bridge.yaml
+```
+
+See [config.example.yaml](config.example.yaml) for all available options and [FEATURES.md](FEATURES.md) for detailed configuration documentation.
+
+### Version 1.0 Code-Based Configuration
+
+For the basic bridge, modify settings in `bridge.py`:
 
 ```python
 # In MessageTracker.__init__()
@@ -273,6 +385,7 @@ sudo usermod -a -G dialout $USER
 
 ## Architecture
 
+### Version 1.0 Architecture
 ```
 ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
 │   Radio 1   │◄────────┤   Bridge    │────────►│   Radio 2   │
@@ -286,36 +399,74 @@ sudo usermod -a -G dialout $USER
                         └─────────────┘
 ```
 
+### Version 2.0 Enhanced Architecture
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Radio 1   │◄───►│             │◄───►│   Radio 2   │
+└─────────────┘     │   Enhanced  │     └─────────────┘
+                    │    Bridge   │
+┌─────────────┐     │             │     ┌─────────────┐
+│   Radio N   │◄───►│   + Core    │◄───►│   Radio N+1 │
+└─────────────┘     └──────┬──────┘     └─────────────┘
+                           │
+           ┌───────────────┼───────────────┐
+           │               │               │
+    ┌──────▼──────┐ ┌─────▼──────┐ ┌─────▼──────┐
+    │   Message   │ │  Database  │ │   Config   │
+    │   Filter    │ │   SQLite   │ │   Manager  │
+    └─────────────┘ └────────────┘ └────────────┘
+           │               │               │
+    ┌──────▼──────┐ ┌─────▼──────┐ ┌─────▼──────┐
+    │    MQTT     │ │    Web     │ │ Prometheus │
+    │   Bridge    │ │ Dashboard  │ │  Metrics   │
+    └─────────────┘ └────────────┘ └────────────┘
+           │               │               │
+    ┌──────▼──────┐ ┌─────▼──────┐ ┌─────▼──────┐
+    │    Home     │ │  Browser   │ │  Grafana   │
+    │  Assistant  │ │   Users    │ │ Monitoring │
+    └─────────────┘ └────────────┘ └────────────┘
+```
+
 ## Files
 
-- `bridge.py`: Core bridge logic and message handling
+**Core Application:**
+- `bridge.py`: Original bridge logic (v1.0)
+- `bridge_enhanced.py`: Enhanced bridge with v2.0 features
 - `gui.py`: Textual-based terminal GUI
 - `device_manager.py`: Auto-detection and settings verification
+
+**v2.0 Feature Modules:**
+- `config.py`: Configuration file management (YAML/JSON)
+- `message_filter.py`: Message filtering system
+- `database.py`: SQLite database manager
+- `metrics.py`: Prometheus metrics exporter
+- `mqtt_bridge.py`: MQTT integration
+- `web_interface.py`: Web dashboard and API
+
+**Configuration & Scripts:**
+- `config.example.yaml`: Example configuration file
 - `run.sh`: Interactive launcher script
 - `install.sh`: Installation and setup script
 - `list-devices.sh`: USB device detection utility
 - `meshtastic-bridge.service`: systemd service file
-- `requirements.txt`: Python dependencies
+
+**Documentation:**
 - `README.md`: Full documentation (this file)
+- `FEATURES.md`: Detailed feature documentation
+- `ROADMAP.md`: Development roadmap
 - `QUICKSTART.md`: Quick start guide
 
-## Future Enhancements
+**Dependencies:**
+- `requirements.txt`: Python dependencies
 
-Completed:
-- [x] Auto-detection of radios
-- [x] Settings verification
-- [x] Auto-start at boot (systemd)
-- [x] Auto-restart on failure
+---
 
-Potential features to add:
-- [ ] Configuration file for channel mapping
-- [ ] Message filtering by content or sender
-- [ ] Metrics export (Prometheus, etc.)
-- [ ] Web interface
-- [ ] Multiple radio support (>2)
-- [ ] Message encryption/decryption
-- [ ] SQLite database for message persistence
-- [ ] MQTT bridge support
+## Documentation
+
+- **[FEATURES.md](FEATURES.md)** - Comprehensive feature documentation with usage examples
+- **[ROADMAP.md](ROADMAP.md)** - Development roadmap and future plans
+- **[QUICKSTART.md](QUICKSTART.md)** - Quick start guide
+- **[config.example.yaml](config.example.yaml)** - Example configuration file
 
 ## License
 

@@ -1,4 +1,22 @@
+# Core Meshtastic dependencies
 meshtastic>=2.7.0
+pyserial>=3.5
+pubsub>=0.9.2
+
+# UI dependencies
 textual>=6.5.0
 rich>=14.2.0
-pyserial>=3.5
+
+# Configuration
+pyyaml>=6.0
+
+# MQTT support
+paho-mqtt>=1.6.1
+
+# Web interface
+flask>=3.0.0
+flask-cors>=4.0.0
+flask-socketio>=5.3.0
+
+# Additional utilities
+python-dateutil>=2.8.2
