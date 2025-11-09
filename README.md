@@ -1,6 +1,26 @@
-# Meshtastic Bridge
+# Meshtastic Bridge - Headless Server Fork
+
+> **🚀 Production-Ready Headless Server Edition**
+> This fork has been optimized for headless server deployments with auto-start on boot and auto-restart on crash.
+>
+> **📖 For headless server deployment, see:**
+> - **[README-HEADLESS.md](README-HEADLESS.md)** - Complete headless server documentation
+> - **[QUICKSTART-HEADLESS.md](QUICKSTART-HEADLESS.md)** - 5-minute quick start guide
+> - **Installation**: Run `./install-headless.sh` to get started
+
+---
 
 A powerful bridge/repeater application for Meshtastic radios that forwards messages between different channel configurations (e.g., LongFast and LongModerate).
+
+## Headless Server Features (This Fork)
+
+- ✅ **100% Headless Operation**: No GUI dependencies
+- ✅ **Auto-Start on Boot**: Systemd service automatically starts on system boot
+- ✅ **Auto-Restart on Crash**: Service automatically recovers from failures
+- ✅ **Crash Protection**: Intelligent restart policies prevent restart loops
+- ✅ **Production-Ready**: Optimized for Raspberry Pi and server deployments
+- ✅ **Resource Efficient**: Minimal memory and CPU usage
+- ✅ **Security Hardened**: Runs with minimal privileges
 
 ## Features
 
@@ -67,11 +87,12 @@ pip install -r requirements.txt
 chmod +x *.py *.sh
 ```
 
-Dependencies:
+Dependencies (Headless):
 - meshtastic
-- textual
-- rich
+- rich (for enhanced logging)
 - pyserial
+
+**Note**: This headless fork does NOT require `textual` (GUI framework). For the original GUI version, see the upstream repository.
 
 ## Usage
 
