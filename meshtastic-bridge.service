@@ -1,0 +1,32 @@
+[Unit]
+Description=Meshtastic Bridge - Radio Repeater Service
+After=network.target multi-user.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=mesh
+Group=mesh
+WorkingDirectory=/home/mesh/meshtastic-bridge
+Environment="PATH=/home/mesh/meshtastic-bridge/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Wait for USB devices to be ready
+ExecStartPre=/bin/sleep 5
+
+# Run the bridge with auto-detection (no GUI for service)
+ExecStart=/home/mesh/meshtastic-bridge/venv/bin/python3 /home/mesh/meshtastic-bridge/bridge.py
+
+# Restart on failure
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=meshtastic-bridge
+
+# Give access to USB serial devices
+SupplementaryGroups=dialout
+
+[Install]
+WantedBy=multi-user.target
